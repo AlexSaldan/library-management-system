@@ -1,4 +1,54 @@
-target/
+### Java & Spring Boot ###
+/target/
+/bin/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+### Eclipse / STS ###
+.metadata/
 .settings/
 .project
 .classpath
+.factorypath
+.springBeans
+*.launch
+bin/
+/blog/bin/
+
+### Build Tools (Maven/Gradle) ###
+.gradle/
+build/
+.mvn/
+mvnw
+mvnw.cmd
+.incremental/
+
+### Environment & Security (Crucial) ###
+.env
+*.env.[a-zA-Z0-9]*
+*.pem
+*.ppk
+*.key
+*.pub
+/config/application-local.properties
+/config/application-local.yml
+
+### OS Specific ###
+.DS_Store
+Thumbs.db
+
+### Frontend (se houver integração) ###
+node_modules/
+dist/
+.npm/
