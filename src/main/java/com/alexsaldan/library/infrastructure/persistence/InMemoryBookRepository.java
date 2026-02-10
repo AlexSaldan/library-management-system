@@ -1,9 +1,9 @@
 package com.alexsaldan.library.infrastructure.persistence;
 
-import com.alexsaldan.library.application.port.out.DeleteBookPort;
-import com.alexsaldan.library.application.port.out.GetBookByIdPort;
-import com.alexsaldan.library.application.port.out.ListBooksPort;
-import com.alexsaldan.library.application.port.out.SaveBookPort;
+import com.alexsaldan.library.application.port.outbound.DeleteBookPort;
+import com.alexsaldan.library.application.port.outbound.GetBookByIdPort;
+import com.alexsaldan.library.application.port.outbound.ListBooksPort;
+import com.alexsaldan.library.application.port.outbound.SaveBookPort;
 import com.alexsaldan.library.domain.Book;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Implementação in-memory das portas de persistência de livros.
- * Única fonte de verdade para o controller e use cases.
+ * Implementação em memória das portas de saída de livros.
+ * Única fonte de verdade para leitura e escrita enquanto não há banco.
  */
 @Repository
 public class InMemoryBookRepository implements SaveBookPort, ListBooksPort, GetBookByIdPort, DeleteBookPort {
@@ -34,6 +34,7 @@ public class InMemoryBookRepository implements SaveBookPort, ListBooksPort, GetB
             books.add(book);
             return book;
         }
+
         books.removeIf(b -> b.getId().equals(book.getId()));
         books.add(book);
         return book;
@@ -46,7 +47,9 @@ public class InMemoryBookRepository implements SaveBookPort, ListBooksPort, GetB
 
     @Override
     public Optional<Book> findById(Long id) {
-        return books.stream().filter(b -> b.getId().equals(id)).findFirst();
+        return books.stream()
+                .filter(b -> b.getId().equals(id))
+                .findFirst();
     }
 
     @Override
@@ -54,3 +57,4 @@ public class InMemoryBookRepository implements SaveBookPort, ListBooksPort, GetB
         return books.removeIf(b -> b.getId().equals(id));
     }
 }
+

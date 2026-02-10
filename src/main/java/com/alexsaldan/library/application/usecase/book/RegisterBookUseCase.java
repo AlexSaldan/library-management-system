@@ -2,7 +2,7 @@ package com.alexsaldan.library.application.usecase.book;
 
 import com.alexsaldan.library.application.dto.book.RegisterBookInput;
 import com.alexsaldan.library.application.dto.book.RegisterBookOutput;
-import com.alexsaldan.library.application.port.out.SaveBookPort;
+import com.alexsaldan.library.application.port.outbound.SaveBookPort;
 import com.alexsaldan.library.domain.Book;
 
 /**

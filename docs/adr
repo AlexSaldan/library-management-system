@@ -1,0 +1,11 @@
+# ADR-001: Use Case–centric Architecture
+
+Status: Accepted
+
+Decision:
+All business operations must be implemented as Use Cases.
+
+Consequences:
+- Controllers contain no business logic.
+- Repositories contain no business logic.
+- Use Cases orchestrate domain behavior.
