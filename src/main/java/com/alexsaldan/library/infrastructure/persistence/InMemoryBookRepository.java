@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Implementação em memória das portas de saída de livros.
- * Única fonte de verdade para leitura e escrita enquanto não há banco.
- */
 @Repository
 public class InMemoryBookRepository implements SaveBookPort, ListBooksPort, GetBookByIdPort, DeleteBookPort {
 
@@ -23,6 +19,7 @@ public class InMemoryBookRepository implements SaveBookPort, ListBooksPort, GetB
     private final AtomicLong nextId = new AtomicLong(1L);
 
     public InMemoryBookRepository() {
+        // Dados iniciais
         books.add(new Book(nextId.getAndIncrement(), "O Senhor dos Anéis", "J.R.R. Tolkien"));
         books.add(new Book(nextId.getAndIncrement(), "1984", "George Orwell"));
     }
@@ -30,11 +27,13 @@ public class InMemoryBookRepository implements SaveBookPort, ListBooksPort, GetB
     @Override
     public Book save(Book book) {
         if (book.getId() == null) {
-            book.setId(nextId.getAndIncrement());
-            books.add(book);
-            return book;
+            // Novo livro: criar cópia com ID atribuído
+            Book newBook = new Book(nextId.getAndIncrement(), book.getTitle(), book.getAuthor());
+            books.add(newBook);
+            return newBook;
         }
 
+        // Atualização: remover antigo e adicionar novo com mesmo ID
         books.removeIf(b -> b.getId().equals(book.getId()));
         books.add(book);
         return book;

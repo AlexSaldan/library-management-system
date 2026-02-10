@@ -2,22 +2,16 @@ package com.alexsaldan.library.infrastructure.web;
 
 import com.alexsaldan.library.application.dto.book.RegisterBookInput;
 import com.alexsaldan.library.application.dto.book.RegisterBookOutput;
-import com.alexsaldan.library.application.port.outbound.DeleteBookPort;
 import com.alexsaldan.library.application.port.outbound.GetBookByIdPort;
 import com.alexsaldan.library.application.port.outbound.ListBooksPort;
-import com.alexsaldan.library.application.port.outbound.SaveBookPort;
+import com.alexsaldan.library.application.usecase.book.DeleteBookUseCase;
 import com.alexsaldan.library.application.usecase.book.RegisterBookUseCase;
+import com.alexsaldan.library.application.usecase.book.UpdateBookUseCase;
 import com.alexsaldan.library.domain.Book;
+import com.alexsaldan.library.exception.BookNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,21 +24,21 @@ import java.util.List;
 public class BookController {
 
     private final RegisterBookUseCase registerBookUseCase;
+    private final UpdateBookUseCase updateBookUseCase;
+    private final DeleteBookUseCase deleteBookUseCase;
     private final ListBooksPort listBooksPort;
     private final GetBookByIdPort getBookByIdPort;
-    private final SaveBookPort saveBookPort;
-    private final DeleteBookPort deleteBookPort;
 
     public BookController(RegisterBookUseCase registerBookUseCase,
+                          UpdateBookUseCase updateBookUseCase,
+                          DeleteBookUseCase deleteBookUseCase,
                           ListBooksPort listBooksPort,
-                          GetBookByIdPort getBookByIdPort,
-                          SaveBookPort saveBookPort,
-                          DeleteBookPort deleteBookPort) {
+                          GetBookByIdPort getBookByIdPort) {
         this.registerBookUseCase = registerBookUseCase;
+        this.updateBookUseCase = updateBookUseCase;
+        this.deleteBookUseCase = deleteBookUseCase;
         this.listBooksPort = listBooksPort;
         this.getBookByIdPort = getBookByIdPort;
-        this.saveBookPort = saveBookPort;
-        this.deleteBookPort = deleteBookPort;
     }
 
     @GetMapping
@@ -66,23 +60,23 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody RegisterBookInput input) {
-        return getBookByIdPort.findById(id)
-                .map(existing -> {
-                    Book updated = new Book(existing.getId(), input.title(), input.author());
-                    Book saved = saveBookPort.save(updated);
-                    return ResponseEntity.ok(saved);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<RegisterBookOutput> updateBook(@PathVariable Long id, @RequestBody RegisterBookInput input) {
+        try {
+            RegisterBookOutput output = updateBookUseCase.execute(id, input);
+            return ResponseEntity.ok(output);
+        } catch (BookNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
-        boolean deleted = deleteBookPort.deleteById(id);
-        if (deleted) {
+        try {
+            deleteBookUseCase.execute(id);
             return ResponseEntity.noContent().build();
+        } catch (BookNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 }
 
