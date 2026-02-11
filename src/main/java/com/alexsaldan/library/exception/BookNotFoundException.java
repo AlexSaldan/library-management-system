@@ -5,7 +5,9 @@ package com.alexsaldan.library.exception;
  */
 public class BookNotFoundException extends RuntimeException {
 
-    public BookNotFoundException(Long id) {
+    private static final long serialVersionUID = 1L;
+
+	public BookNotFoundException(Long id) {
         super("Livro com ID " + id + " não encontrado");
     }
 }
